@@ -1,0 +1,363 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B2566">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EUREKA Connect">
+<meta name="robots" content="noindex,nofollow">
+<meta name="format-detection" content="telephone=yes"><title>EUREKA Connect — KEP Congo</title><link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20">
+</head>
+<body>
+
+<!-- =================== Écran de connexion =================== -->
+<section id="auth" class="auth" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-logo"><img src="icons/logo-connexion.png?v=3" alt="EUREKA Connect — Annuaire digital intelligent"></div>
+      <div class="logo">EUREKA <span>Connect</span></div>
+      <div class="tagline">Annuaire digital intelligent</div>
+      <div id="authClient" class="auth-client">KEP Congo</div>
+    </div>
+
+    <div class="auth-tabs" role="tablist">
+      <button id="tabUser" class="auth-tab active" role="tab" aria-selected="true" type="button" onclick="switchAuthTab('user')">
+        <span data-icon="user"></span><span>Utilisateur</span>
+      </button>
+      <button id="tabAdmin" class="auth-tab" role="tab" aria-selected="false" type="button" onclick="switchAuthTab('admin')">
+        <span data-icon="shield"></span><span>Administrateur</span>
+      </button>
+    </div>
+
+    <form id="loginForm" class="auth-form" onsubmit="submitLogin(event)" novalidate>
+      <h1 id="authTitle">Connexion utilisateur</h1>
+      <p id="authHint" class="auth-hint">Consultez l'annuaire et ajoutez vos collègues à vos contacts.</p>
+      <div class="field"><span class="field-icon" data-icon="user"></span><input id="loginId" autocomplete="username" placeholder="Identifiant ou email" aria-label="Identifiant ou email" required></div>
+      <div class="field">
+        <span class="field-icon" data-icon="lock"></span>
+        <input id="loginPwd" type="password" autocomplete="current-password" placeholder="Mot de passe" aria-label="Mot de passe" required>
+        <button type="button" class="field-clear" onclick="togglePwd('loginPwd',this)" aria-label="Afficher le mot de passe"><span data-icon="eye"></span></button>
+      </div>
+      <p id="loginError" class="auth-error" role="alert"></p>
+      <button id="loginBtn" class="btn btn-primary btn-block" type="submit">
+        <span class="btn-icon" data-icon="log-in"></span><span>Se connecter</span>
+      </button>
+    </form>
+    <p class="auth-foot">Accès réservé au personnel de KEP Congo.</p>
+  </div>
+</section>
+
+<!-- =================== Application =================== -->
+<header class="top">
+  <div class="shell">
+    <div class="brand">
+      <div class="brand-left">
+        <label id="clientLogoWrap" class="client-logo-wrap" style="display:none" title="Logo de l'entreprise">
+          <img id="clientLogo" class="client-logo" alt="Logo client">
+          <span class="logo-empty admin-only"><span data-icon="image"></span><small>Ajouter un logo</small></span>
+          <span class="logo-edit admin-only" aria-hidden="true"><span data-icon="pencil"></span></span>
+          <input class="admin-only" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="loadClientLogo(event)" hidden>
+        </label>
+        <div class="brand-text">
+          <div class="logo">EUREKA <span>Connect</span></div>
+          <div class="tagline">Annuaire digital intelligent</div>
+        </div>
+      </div>
+      <div class="brand-actions">
+        <span id="whoami" class="whoami"></span>
+        <button id="installAppBtn" class="btn btn-ghost install-top" style="display:none" onclick="installApp()" aria-label="Installer l'application">
+          <span class="btn-icon" data-icon="download"></span><span class="btn-label">Installer</span>
+        </button>
+        <button class="btn btn-ghost admin-only" onclick="openAdmin()" aria-label="Ouvrir l'administration">
+          <span class="btn-icon" data-icon="sliders"></span><span class="btn-label">Administration</span>
+        </button>
+        <button class="btn btn-ghost" onclick="logout()" aria-label="Se déconnecter" title="Se déconnecter">
+          <span class="btn-icon" data-icon="log-out"></span><span class="btn-label">Déconnexion</span>
+        </button>
+      </div>
+    </div>
+    <div class="hero">
+      <h2>Trouvez le bon collaborateur instantanément.</h2>
+      <p id="heroText">Recherchez, contactez et ajoutez vos collègues directement à votre téléphone.</p>
+    </div>
+  </div>
+</header>
+
+<div class="panel">
+  <div class="search">
+    <div class="field">
+      <span class="field-icon" data-icon="search"></span>
+      <input id="q" placeholder="Nom, matricule, fonction, service, email…" aria-label="Rechercher un collaborateur">
+      <button id="qClear" class="field-clear" type="button" aria-label="Effacer la recherche" style="display:none">
+        <span data-icon="x"></span>
+      </button>
+    </div>
+    <div class="field select-field">
+      <span class="field-icon" data-icon="building"></span>
+      <select id="dept" aria-label="Filtrer par service"><option value="">Tous les services</option></select>
+    </div>
+    <div class="field select-field">
+      <span class="field-icon" data-icon="map-pin"></span>
+      <select id="site" aria-label="Filtrer par site"><option value="">Tous les sites</option></select>
+    </div>
+  </div>
+</div>
+
+<div id="iosInstallHint" class="ios-install-hint" style="display:none">
+  <div class="hint-text"><b>Installer EUREKA Connect</b><span>Sur iPhone : Partager → Ajouter à l'écran d'accueil.</span></div>
+  <button onclick="dismissIOSHint()" aria-label="Fermer ce message"><span data-icon="x"></span></button>
+</div>
+
+<main class="content">
+  <div class="toolbar">
+    <b id="count"></b>
+    <div class="toolbar-actions admin-only">
+      <a class="btn btn-outline btn-sm hide-mobile" href="downloads/Personnel%20KEP%20CONGO.xlsx" download="Personnel KEP CONGO.xlsx">
+        <span class="btn-icon" data-icon="bar-chart"></span><span class="btn-label">Fichier Excel</span>
+      </a>
+      <button class="btn btn-primary btn-sm" onclick="addNew()">
+        <span class="btn-icon" data-icon="user-plus"></span><span class="btn-label">Nouveau collaborateur</span>
+      </button>
+    </div>
+  </div>
+  <div id="grid" class="grid"></div>
+  <section class="export-all">
+    <div>
+      <b>Tous les collaborateurs</b>
+      <span id="exportAllInfo">Un seul fichier .vcf contenant toutes les fiches de l'annuaire.</span>
+    </div>
+    <button class="btn btn-primary" onclick="downloadAllVCF()">
+      <span class="btn-icon" data-icon="download"></span><span>Télécharger le vcf</span>
+    </button>
+  </section>
+</main>
+
+<!-- =================== Administration =================== -->
+<div id="admin" class="admin">
+  <div class="modal">
+    <button class="close icon-btn" onclick="closeAdmin()" aria-label="Fermer l'administration"><span data-icon="x"></span></button>
+    <h2>Administration — EUREKA Connect</h2>
+
+    <section class="client-box logo-box">
+      <h3>Logo et nom de l'entreprise</h3>
+      <div class="logo-admin">
+        <div id="logoAdminPreview" class="logo-admin-preview"><span class="logo-admin-empty">Aucun logo</span></div>
+        <div class="logo-admin-side">
+          <div class="field">
+            <span class="field-icon" data-icon="building"></span>
+            <input id="clientName" placeholder="Ex. KEP Congo" oninput="saveClientBrand()" aria-label="Nom de l'entreprise">
+          </div>
+          <div class="logo-admin-actions">
+            <label class="btn btn-primary">
+              <span class="btn-icon" data-icon="upload"></span><span class="btn-label">Télécharger un nouveau logo</span>
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="loadClientLogo(event)" hidden>
+            </label>
+            <button id="removeLogoBtn" class="btn btn-danger-outline" type="button" onclick="removeClientLogo()">
+              <span class="btn-icon" data-icon="trash"></span><span class="btn-label">Retirer le logo</span>
+            </button>
+          </div>
+          <button class="btn btn-outline" type="button" onclick="downloadLogoForSite()">
+            <span class="btn-icon" data-icon="download"></span><span class="btn-label">Fichier pour le site (logo-client.png)</span>
+          </button>
+          <p class="db-tools-note">PNG, JPEG, WebP ou SVG, 1,5 Mo maximum. <b>Un logo téléchargé ici n'apparaît que sur cet appareil.</b> Pour l'afficher sur tous les téléphones : cliquez sur « Fichier pour le site », puis déposez <code>logo-client.png</code> dans le dossier <code>icons/</code> de votre dépôt GitHub.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="stats">
+      <div class="stat"><b id="statPeople"></b><span>Collaborateurs</span></div>
+      <div class="stat"><b id="statDept"></b><span>Services</span></div>
+      <div class="stat"><b id="statSites"></b><span>Sites</span></div>
+    </div>
+
+    <section class="client-box">
+      <h3>Mise à jour du personnel</h3>
+      <p class="db-tools-note">Complétez le fichier <b>Personnel KEP CONGO</b> puis importez-le : les matricules existants sont mis à jour, les nouveaux sont ajoutés.</p>
+      <div class="admin-tools">
+        <label class="btn btn-primary">
+          <span class="btn-icon" data-icon="upload"></span><span class="btn-label">Importer Excel</span>
+          <input type="file" accept=".xlsx,.xls" onchange="importExcel(event)" hidden>
+        </label>
+        <a class="btn btn-outline" href="downloads/Personnel%20KEP%20CONGO.xlsx" download="Personnel KEP CONGO.xlsx">
+          <span class="btn-icon" data-icon="bar-chart"></span><span class="btn-label">Télécharger le fichier Excel</span>
+        </a>
+        <button class="btn btn-outline" onclick="addNew()">
+          <span class="btn-icon" data-icon="plus"></span><span class="btn-label">Ajouter</span>
+        </button>
+        <label class="btn btn-outline">
+          <span class="btn-icon" data-icon="upload"></span><span class="btn-label">Importer CSV</span>
+          <input type="file" accept=".csv" onchange="importCSV(event)" hidden>
+        </label>
+        <button class="btn btn-outline" onclick="exportCSV()">
+          <span class="btn-icon" data-icon="download"></span><span class="btn-label">Exporter CSV</span>
+        </button>
+        <button class="btn btn-danger-outline" onclick="resetData()">
+          <span class="btn-icon" data-icon="rotate-ccw"></span><span class="btn-label">Réinitialiser</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Comptes d'accès -->
+    <section class="client-box">
+      <h3>Comptes d'accès</h3>
+      <p class="db-tools-note">Créez les identifiants des <b>utilisateurs</b> (consultation de l'annuaire) et des <b>administrateurs</b> (gestion du personnel et des comptes).</p>
+      <form id="accountForm" class="formgrid" onsubmit="submitAccount(event)">
+        <div class="field"><span class="field-icon" data-icon="user"></span><input id="a_name" placeholder="Nom complet" aria-label="Nom complet" required></div>
+        <div class="field"><span class="field-icon" data-icon="id-card"></span><input id="a_login" placeholder="Identifiant ou email" aria-label="Identifiant" autocomplete="off" required></div>
+        <div class="field">
+          <span class="field-icon" data-icon="lock"></span>
+          <input id="a_pwd" type="password" placeholder="Mot de passe (8 caractères min.)" aria-label="Mot de passe" autocomplete="new-password" minlength="8" required>
+          <button type="button" class="field-clear" onclick="togglePwd('a_pwd',this)" aria-label="Afficher le mot de passe"><span data-icon="eye"></span></button>
+        </div>
+        <div class="field select-field">
+          <span class="field-icon" data-icon="shield"></span>
+          <select id="a_role" aria-label="Rôle">
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
+          </select>
+        </div>
+        <div class="form-actions span-2">
+          <button class="btn btn-primary" type="submit"><span class="btn-icon" data-icon="user-plus"></span><span class="btn-label">Créer le compte</span></button>
+        </div>
+      </form>
+      <div class="table-wrap accounts-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Identifiant</th><th>Rôle</th><th>Actions</th></tr></thead>
+          <tbody id="accountRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="client-box db-box">
+      <h3>Base de données locale</h3>
+      <p class="db-tools-note">Les collaborateurs et les comptes sont stockés dans une base propre à ce navigateur (IndexedDB). Utilisez <b>Sauvegarder la base</b> pour créer un fichier de secours, et <b>Restaurer une sauvegarde</b> pour la recharger sur un autre appareil.</p>
+      <div class="admin-tools">
+        <button class="btn btn-outline" onclick="backupDatabase()">
+          <span class="btn-icon" data-icon="database"></span><span class="btn-label">Sauvegarder la base</span>
+        </button>
+        <label class="btn btn-outline">
+          <span class="btn-icon" data-icon="upload"></span><span class="btn-label">Restaurer une sauvegarde</span>
+          <input type="file" accept=".json" onchange="restoreDatabase(event)" hidden>
+        </label>
+      </div>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Collaborateur</th><th>Matricule</th><th>Service</th><th>Site</th><th>Actions</th></tr></thead>
+        <tbody id="adminRows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =================== Export de tous les contacts =================== -->
+<div id="exportModal" class="admin">
+  <div class="modal modal-sm">
+    <button class="close icon-btn" type="button" onclick="closeExportModal()" aria-label="Fermer"><span data-icon="x"></span></button>
+    <h2>Tous les collaborateurs</h2>
+    <p class="db-tools-note">Le fichier <b>.vcf global</b> contient les fiches de <b id="exportCount"></b> en un seul fichier :</p>
+    <ol id="exportList" class="export-list"></ol>
+    <div class="admin-tools">
+      <button class="btn btn-primary" type="button" onclick="saveAllVCF()">
+        <span class="btn-icon" data-icon="download"></span><span class="btn-label">Télécharger le vcf global</span>
+      </button>
+      <button class="btn btn-outline" type="button" onclick="saveAllCSV()">
+        <span class="btn-icon" data-icon="file"></span><span class="btn-label">Version Outlook (CSV)</span>
+      </button>
+    </div>
+    <div class="note export-help">
+      <b>Sur Windows, un double-clic sur le fichier .vcf n'affiche que la première fiche</b> : c'est une limite d'Outlook et de l'application Contacts de Windows. Le fichier contient pourtant bien tous les agents. Pour les ajouter tous d'un coup :
+      <ul>
+        <li><b>Google Contacts / Gmail</b> : contacts.google.com → Importer → choisir le fichier .vcf.</li>
+        <li><b>Outlook (Windows)</b> : utilisez la <b>Version Outlook (CSV)</b>, puis Fichier → Ouvrir et exporter → Importer/Exporter → « Importer à partir d'un autre programme ou fichier » → Valeurs séparées par une virgule.</li>
+        <li><b>Outlook.com / Outlook web</b> : Contacts → Gérer les contacts → Importer des contacts → fichier CSV.</li>
+        <li><b>iPhone / Android</b> : ouvrez le fichier .vcf sur le téléphone, puis « Ajouter tous les contacts ».</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- =================== Fiche collaborateur (ajout / modification) =================== -->
+<div id="personModal" class="admin">
+  <div class="modal modal-sm">
+    <button class="close icon-btn" type="button" onclick="closePersonForm()" aria-label="Fermer"><span data-icon="x"></span></button>
+    <form id="personForm" onsubmit="submitPerson(event)">
+      <h2 id="formTitle">Ajouter un collaborateur</h2>
+      <input id="editIndex" type="hidden">
+      <div class="photo-field">
+        <div class="photo-avatar" id="photoAvatar" data-icon="user"></div>
+        <label class="btn btn-outline btn-sm">
+          <span class="btn-icon" data-icon="image"></span><span class="btn-label">Photo</span>
+          <input type="file" accept="image/png,image/jpeg,image/webp" onchange="onPhotoSelected(event)" hidden>
+        </label>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="clearPhoto()">
+          <span class="btn-icon" data-icon="x"></span><span class="btn-label">Retirer</span>
+        </button>
+      </div>
+      <div class="formgrid">
+        <div class="field"><span class="field-icon" data-icon="user"></span><input id="f_last" placeholder="Nom" aria-label="Nom" required></div>
+        <div class="field"><span class="field-icon" data-icon="user"></span><input id="f_first" placeholder="Prénom" aria-label="Prénom" required></div>
+        <div class="field"><span class="field-icon" data-icon="id-card"></span><input id="f_matricule" placeholder="Matricule, ex. KEP-0041" aria-label="Matricule"></div>
+        <div class="field"><span class="field-icon" data-icon="briefcase"></span><input id="f_title" placeholder="Fonction" aria-label="Fonction"></div>
+        <div class="field"><span class="field-icon" data-icon="building"></span><input id="f_department" list="deptList" placeholder="Service" aria-label="Service"></div>
+        <div class="field select-field">
+          <span class="field-icon" data-icon="map-pin"></span>
+          <select id="f_location" aria-label="Site" required>
+            <option value="">Site…</option>
+            <option value="PNR">PNR</option>
+            <option value="BZV">BZV</option>
+            <option value="Bondji">Bondji</option>
+          </select>
+        </div>
+        <div class="field"><span class="field-icon" data-icon="mail"></span><input id="f_email" type="email" placeholder="Email" aria-label="Email"></div>
+        <div class="field"><span class="field-icon" data-icon="phone"></span><input id="f_phone" type="tel" placeholder="Téléphone, ex. 06 123 45 67" aria-label="Téléphone"></div>
+      </div>
+      <datalist id="deptList"></datalist>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit"><span class="btn-icon" data-icon="check"></span><span class="btn-label">Enregistrer</span></button>
+        <button class="btn btn-ghost" type="button" onclick="closePersonForm()"><span class="btn-icon" data-icon="x"></span><span class="btn-label">Annuler</span></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Navigation mobile">
+  <button class="nav-item active" onclick="goHome(this)" aria-label="Accueil">
+    <span class="nav-icon" data-icon="home"></span><span>Accueil</span>
+  </button>
+  <button class="nav-item" onclick="focusDirectory(this)" aria-label="Annuaire">
+    <span class="nav-icon" data-icon="users"></span><span>Annuaire</span>
+  </button>
+  <button class="nav-item" onclick="focusSearch(this)" aria-label="Recherche">
+    <span class="nav-icon" data-icon="search"></span><span>Recherche</span>
+  </button>
+  <button class="nav-item admin-only" onclick="openAdminFromNav(this)" aria-label="Administration">
+    <span class="nav-icon" data-icon="sliders"></span><span>Admin</span>
+  </button>
+  <button class="nav-item user-only" onclick="logout()" aria-label="Se déconnecter">
+    <span class="nav-icon" data-icon="log-out"></span><span>Quitter</span>
+  </button>
+</nav>
+
+<footer class="foot">EUREKA Connect • KEP Congo</footer>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="app.js?v=20"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+  });
+  // Nouvelle version installée : on recharge une seule fois pour l'utiliser.
+  let _swReloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if(_swReloaded || !navigator.serviceWorker.controller) return;
+    _swReloaded=true; window.location.reload();
+  });
+}
+</script>
+</body></html>
